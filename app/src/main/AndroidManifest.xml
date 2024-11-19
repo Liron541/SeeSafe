@@ -23,7 +23,9 @@
         </activity>
         <activity android:name=".LoginActivity" />
         <activity android:name=".RegisterActivity" />
-        <activity android:name=".PageForHelper" />
+        <activity android:name=".HelperPage" />
+        <activity android:name=".FriendListActivity" />
+
     </application>
 
 </manifest>

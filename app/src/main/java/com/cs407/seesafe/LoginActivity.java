@@ -37,7 +37,8 @@ public class LoginActivity extends AppCompatActivity {
                 runOnUiThread(() -> {
                     if (user != null) {
                         Toast.makeText(LoginActivity.this, "Login Successful!", Toast.LENGTH_SHORT).show();
-                        Intent intent = new Intent(LoginActivity.this, PageForHelper.class);
+                        Intent intent = new Intent(LoginActivity.this, HelperPage.class);
+                        intent.putExtra("username", username);
                         startActivity(intent);
                     } else {
                         Toast.makeText(LoginActivity.this, "Incorrect user name or password!", Toast.LENGTH_SHORT).show();

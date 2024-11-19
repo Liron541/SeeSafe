@@ -18,7 +18,7 @@
         android:layout_marginStart="16dp" />
 
     <androidx.appcompat.widget.SwitchCompat
-        android:id="@+id/switch1"
+        android:id="@+id/switchControl"
         android:layout_width="198dp"
         android:text="Willing to help now!"
         android:layout_height="123dp"
