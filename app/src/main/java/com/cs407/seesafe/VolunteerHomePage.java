@@ -2,32 +2,21 @@ package com.cs407.seesafe;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ExpandableListView;
-import android.widget.Spinner;
-import android.widget.Switch;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SwitchCompat;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
-import com.google.android.material.bottomsheet.BottomSheetDialog;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
-public class HelperPage extends AppCompatActivity {
+public class VolunteerHomePage extends AppCompatActivity {
 
     private SwitchCompat switchControl;
     private Button friendsButton;
@@ -52,7 +41,7 @@ public class HelperPage extends AppCompatActivity {
         // Set a listener for child item clicks
         expandableListView.setOnChildClickListener((parent, v, groupPosition, childPosition, id) -> {
             String selectedItem = childList.get(groupList.get(groupPosition)).get(childPosition);
-            Toast.makeText(HelperPage.this, "Selected: " + selectedItem, Toast.LENGTH_SHORT).show();
+            Toast.makeText(VolunteerHomePage.this, "Selected: " + selectedItem, Toast.LENGTH_SHORT).show();
             return true;
         });
         // ------------------------Drop Down------------------------------^
@@ -76,14 +65,14 @@ public class HelperPage extends AppCompatActivity {
 
         switchControl.setOnCheckedChangeListener((buttonView, isChecked) -> {
             if (isChecked) {
-                Toast.makeText(HelperPage.this, "Switch On", Toast.LENGTH_SHORT).show();
+                Toast.makeText(VolunteerHomePage.this, "Switch On", Toast.LENGTH_SHORT).show();
             } else {
-                Toast.makeText(HelperPage.this, "Switch Off", Toast.LENGTH_SHORT).show();
+                Toast.makeText(VolunteerHomePage.this, "Switch Off", Toast.LENGTH_SHORT).show();
             }
         });
 
         friendsButton.setOnClickListener(v -> {
-            Intent friendIntent = new Intent(HelperPage.this, FriendListActivity.class);
+            Intent friendIntent = new Intent(VolunteerHomePage.this, FriendListActivity.class);
             friendIntent.putExtra("username", username);
             startActivity(friendIntent);
         });
@@ -133,11 +122,11 @@ public class HelperPage extends AppCompatActivity {
             finish();
             return true;
         } else if (id == R.id.action_help) {
-            Intent intent = new Intent(this, HelpActivities.class);
+            Intent intent = new Intent(this, HelpActivity.class);
             startActivity(intent);
             return true;
         } else if (id == R.id.action_profile) {
-            Intent intent = new Intent(this, HelpActivities.class);
+            Intent intent = new Intent(this, ProfileActivity.class);
             startActivity(intent);
             return true;
         }

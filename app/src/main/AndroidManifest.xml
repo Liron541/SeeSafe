@@ -26,11 +26,12 @@
         <!-- Other activities -->
         <activity android:name=".LoginActivity" />
         <activity android:name=".RegisterActivity" />
-        <activity android:name=".HelperPage" />
+        <activity android:name=".VolunteerHomePage" />
         <activity android:name=".FriendListActivity" />
+        <activity android:name=".ProfileActivity" />
 
         <!-- HelpActivity declaration -->
-        <activity android:name=".HelpActivities" />
+        <activity android:name=".HelpActivity" />
 
     </application>
 
