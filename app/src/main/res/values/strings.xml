@@ -3,6 +3,24 @@
     <string name="username_hint" />
     <string name="password_hint" />
     <string name="login_button" />
+    <string name="logout">Log Out</string>
+    <string name="delete_account">Delete Account</string>
+    <string name="help">Help</string>
+    <string name="profile">Profile</string>
+    <string name="map">Map</string>
+
+    <string-array name="volunteers_array">
+        <item>Volunteer 1</item>
+        <item>Volunteer 2</item>
+        <item>Volunteer 3</item>
+    </string-array>
+
+    <string-array name="blind_friends_array">
+        <item>Blind Friend 1</item>
+        <item>Blind Friend 2</item>
+        <item>Blind Friend 3</item>
+    </string-array>
+
     <string name="please_allow_notification">Please allow all notifications to continue.</string>
     <string name="replied">Replied: %1$s (to message %2$d)</string>
     <string name="channel_name">Chat</string>

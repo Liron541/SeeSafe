@@ -16,7 +16,8 @@ public class User {
     private String password;
 
     @ColumnInfo(name = "friends")
-    private String friends; // 用 JSON 格式存储好友信息
+    private String friends;
+
 
     // Getters and Setters
     public int getId() {
@@ -50,5 +51,6 @@ public class User {
     public void setFriends(String friends) {
         this.friends = friends;
     }
+
 }
 
