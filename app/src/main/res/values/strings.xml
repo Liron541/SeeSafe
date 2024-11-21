@@ -7,6 +7,7 @@
     <string name="delete_account">Delete Account</string>
     <string name="help">Help</string>
     <string name="profile">Profile</string>
+    <string name="map">Map</string>
 
     <string-array name="volunteers_array">
         <item>Volunteer 1</item>

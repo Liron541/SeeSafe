@@ -129,6 +129,10 @@ public class VolunteerHomePage extends AppCompatActivity {
             Intent intent = new Intent(this, ProfileActivity.class);
             startActivity(intent);
             return true;
+        } else if (id == R.id.action_map) {
+            Intent intent = new Intent(this, MapActivity.class);
+            startActivity(intent);
+            return true;
         }
         return super.onOptionsItemSelected(item);
     }

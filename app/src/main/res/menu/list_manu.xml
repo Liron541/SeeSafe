@@ -26,4 +26,10 @@
         android:icon="@android:drawable/ic_lock_idle_charging"
         app:showAsAction="never" />
 
+    <item
+        android:id="@+id/action_map"
+        android:title="@string/map"
+        android:icon="@android:drawable/ic_lock_idle_charging"
+        app:showAsAction="never" />
+
 </menu>

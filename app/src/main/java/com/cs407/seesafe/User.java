@@ -18,6 +18,7 @@ public class User {
     @ColumnInfo(name = "friends")
     private String friends;
 
+
     // Getters and Setters
     public int getId() {
         return id;
@@ -50,5 +51,6 @@ public class User {
     public void setFriends(String friends) {
         this.friends = friends;
     }
+
 }
 
