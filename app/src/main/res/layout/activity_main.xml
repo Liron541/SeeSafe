@@ -7,14 +7,14 @@
     android:id="@+id/main">
 
     <com.google.android.material.button.MaterialButton
-        android:id="@+id/topButton"
+        android:id="@+id/btn_volunteer_login"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:text=" I'm here to help! Click to continue."
         android:textColor="@color/black"
         android:textSize="40dp"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toTopOf="@+id/bottomButton"
+        app:layout_constraintBottom_toTopOf="@+id/btn_request_help"
         app:layout_constraintHeight_percent="0.33"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
@@ -22,13 +22,13 @@
         android:background="@drawable/rectangular_button"/>
 
     <com.google.android.material.button.MaterialButton
-        android:id="@+id/bottomButton"
+        android:id="@+id/btn_request_help"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:text="Button for Blind People finding helper!"
         android:textColor="@color/black"
         android:textSize="50dp"
-        app:layout_constraintTop_toBottomOf="@id/topButton"
+        app:layout_constraintTop_toBottomOf="@id/btn_volunteer_login"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintHeight_percent="0.67"
         app:layout_constraintLeft_toLeftOf="parent"

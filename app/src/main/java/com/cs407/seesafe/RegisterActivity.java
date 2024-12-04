@@ -31,14 +31,14 @@ public class RegisterActivity extends AppCompatActivity {
             String password = passwordEditText.getText().toString().trim();
 
             if (username.isEmpty() || password.isEmpty()) {
-                Toast.makeText(RegisterActivity.this, "用户名和密码不能为空", Toast.LENGTH_SHORT).show();
+                Toast.makeText(RegisterActivity.this, "Username and password cannot be empty", Toast.LENGTH_SHORT).show();
                 return;
             }
 
             new Thread(() -> {
                 if (userDao.getUserByUsername(username) != null) {
                     runOnUiThread(() ->
-                            Toast.makeText(RegisterActivity.this, "用户名已存在", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(RegisterActivity.this, "Username already exists", Toast.LENGTH_SHORT).show()
                     );
                 } else {
                     User user = new User();
@@ -47,7 +47,7 @@ public class RegisterActivity extends AppCompatActivity {
                     user.setFriends("[]"); // 初始化为空列表
                     userDao.insert(user);
                     runOnUiThread(() -> {
-                        Toast.makeText(RegisterActivity.this, "注册成功", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(RegisterActivity.this, "Register Successfully", Toast.LENGTH_SHORT).show();
                         finish();
                     });
                 }

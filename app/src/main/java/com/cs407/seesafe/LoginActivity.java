@@ -37,7 +37,7 @@ public class LoginActivity extends AppCompatActivity {
                 runOnUiThread(() -> {
                     if (user != null) {
                         Toast.makeText(LoginActivity.this, "Login Successful!", Toast.LENGTH_SHORT).show();
-                        Intent intent = new Intent(LoginActivity.this, VolunteerHomePage.class);
+                        Intent intent = new Intent(LoginActivity.this, VolunteerActivity.class);
                         intent.putExtra("username", username);
                         startActivity(intent);
                     } else {
@@ -53,3 +53,4 @@ public class LoginActivity extends AppCompatActivity {
         });
     }
 }
+
