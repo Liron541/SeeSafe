@@ -3,6 +3,7 @@ package com.cs407.seesafe;
 import android.Manifest;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.speech.tts.TextToSpeech;
 import android.view.SurfaceView;
 import android.widget.Button;
 import android.widget.FrameLayout;
@@ -12,6 +13,8 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+
+import java.util.Locale;
 
 import io.agora.rtc2.ChannelMediaOptions;
 import io.agora.rtc2.Constants;
@@ -26,12 +29,14 @@ public class VideoChatActivity extends AppCompatActivity {
     private final String token = "007eJxTYFixNvaW0qO8Xwu2eTSY66+sjfnB9NBma1S1Y3vszPVGivwKDCkWyaapxpaJphapaSYGluZJpuaWlqkmBgaJSWapZkkpbzQC0xsCGRk+PuNlZWSAQBCfgyE4NTU4MS3VkIEBAO2jIOY=";
 
     private RtcEngine mRtcEngine;
+    private TextToSpeech tts;
 
     private final IRtcEngineEventHandler mRtcEventHandler = new IRtcEngineEventHandler() {
         @Override
         public void onUserJoined(int uid, int elapsed) {
             runOnUiThread(() -> {
                 setupRemoteVideo(uid); // 调用远端视频设置方法
+                tts.speak("A user has joined the call.", TextToSpeech.QUEUE_FLUSH, null, null);
             });
         }
 
@@ -39,6 +44,7 @@ public class VideoChatActivity extends AppCompatActivity {
         public void onUserOffline(int uid, int reason) {
             runOnUiThread(() -> {
                 Toast.makeText(VideoChatActivity.this, "user offline: " + uid, Toast.LENGTH_SHORT).show();
+                tts.speak("A user has left the call.", TextToSpeech.QUEUE_FLUSH, null, null);
                 removeRemoteVideo();
             });
         }
@@ -50,6 +56,13 @@ public class VideoChatActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_video_chat);
+
+        tts = new TextToSpeech(this, status -> {
+            if (status == TextToSpeech.SUCCESS) {
+                tts.setLanguage(Locale.US);
+                tts.speak("Welcome to the video call.", TextToSpeech.QUEUE_FLUSH, null, null);
+            }
+        });
 
         // 使用固定的频道名和 Token
         if (checkPermissions()) {
@@ -68,6 +81,7 @@ public class VideoChatActivity extends AppCompatActivity {
         // 处理结束通话按钮点击事件
         Button endCallButton = findViewById(R.id.btn_end_call);
         endCallButton.setOnClickListener(v -> {
+            tts.speak("Ending the call. Thank you for your help! Goodbye.", TextToSpeech.QUEUE_FLUSH, null, null);
             if (mRtcEngine != null) {
                 mRtcEngine.leaveChannel(); // 离开频道
             }
@@ -97,6 +111,7 @@ public class VideoChatActivity extends AppCompatActivity {
             options.channelProfile = Constants.CHANNEL_PROFILE_COMMUNICATION;
 
             mRtcEngine.joinChannel(token, channelName, 0, options);
+            tts.speak("You have joined the video call.", TextToSpeech.QUEUE_FLUSH, null, null);
         } catch (Exception e) {
             throw new RuntimeException("Agora SDK initialization failed, check the parameters", e);
         }
@@ -169,6 +184,10 @@ public class VideoChatActivity extends AppCompatActivity {
             mRtcEngine.stopPreview();
             RtcEngine.destroy();
             mRtcEngine = null;
+        }
+        if (tts != null) {
+            tts.stop();
+            tts.shutdown();
         }
     }
 }

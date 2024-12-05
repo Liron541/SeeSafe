@@ -13,8 +13,7 @@
             android:id="@+id/switch_available"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="是否在线" />
-
+            android:text="Ready to help!" />
 
 
     </LinearLayout>

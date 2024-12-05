@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp"
+    android:background="#F5F5F5">
+
+    <!-- Title -->
+    <TextView
+        android:id="@+id/termsTitle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Terms and Conditions"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:gravity="center"
+        android:textColor="#000000"
+        android:contentDescription="Terms and Conditions, you can click the bottom part of the screen whenever you finished, by doing so you are agree to all the term and conditions"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent" />
+
+    <!-- Terms and Conditions Description -->
+    <ScrollView
+        android:id="@+id/scrollView"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintTop_toBottomOf="@id/termsTitle"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/proceedButton">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="8dp">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="16sp"
+                android:lineSpacingExtra="8dp"
+                android:textColor="#333333"
+                android:contentDescription="By using this feature, you agree to the following terms:
+                    \n1. This service is exclusively for individuals with visual impairments.
+                    \n2. Be respectful to the volunteers offering help.
+                    \n3. Do not use inappropriate language or behavior during the call.
+                    \n4. Misuse of this feature may result in the termination of access.
+                    \n5. The service is provided as a free offering by volunteers.
+                    \n6. This feature should not be used for emergencies.
+                    \n7. Ensure a stable internet connection for effective communication.
+                    \n8. Volunteers are not responsible for solving complex problems.
+                    \n9. Do not share personal or sensitive information during the call.
+                    \n10.Calls may be monitored or reviewed for quality assurance.
+                    \n11.SeeSafe reserves the right of final interpretation
+                    \n"
+
+                android:text="By using this feature, you agree to the following terms:
+                    \n1. This service is exclusively for individuals with visual impairments.
+                    \n2. Be respectful to the volunteers offering help.
+                    \n3. Do not use inappropriate language or behavior during the call.
+                    \n4. Misuse of this feature may result in the termination of access.
+                    \n5. The service is provided as a free offering by volunteers.
+                    \n6. This feature should not be used for emergencies.
+                    \n7. Ensure a stable internet connection for effective communication.
+                    \n8. Volunteers are not responsible for solving complex problems.
+                    \n9. Do not share personal or sensitive information during the call.
+                    \n10.Calls may be monitored or reviewed for quality assurance.
+                    \n11.SeeSafe reserves the right of final interpretation
+                    \n" />
+        </LinearLayout>
+    </ScrollView>
+
+    <!-- Proceed Button -->
+    <Button
+        android:id="@+id/proceedButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Proceed to Video Call\n(By clicking this, you agree to the terms and conditions)"
+        android:textColor="@android:color/white"
+        android:backgroundTint="#00796B"
+        android:gravity="center"
+        android:padding="16dp"
+        android:lineSpacingExtra="4dp"
+        android:textSize="18sp"
+        android:textAlignment="center"
+        android:textStyle="bold"
+        android:contentDescription="Proceed to video call by agreeing to the terms and conditions"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent" />
+</androidx.constraintlayout.widget.ConstraintLayout>

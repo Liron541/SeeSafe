@@ -78,7 +78,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:padding="12dp"
-            android:hint="Camilla L" />
+            android:hint="User Name" />
 
         <!-- Display Name -->
         <TextView
@@ -92,7 +92,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:padding="12dp"
-            android:hint="Camilla L" />
+            android:hint="User Name" />
 
         <!-- Title -->
         <TextView

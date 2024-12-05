@@ -4,6 +4,7 @@ import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.speech.tts.TextToSpeech;
 import android.util.Log;
 import android.widget.Button;
 import android.widget.Toast;
@@ -22,6 +23,7 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
+import java.util.Locale;
 
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
@@ -36,6 +38,7 @@ public class BlindUserActivity extends AppCompatActivity {
     private static final int PERMISSION_REQUEST_CODE = 1;
 
     private DatabaseReference databaseReference;
+    private TextToSpeech tts;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,12 +48,34 @@ public class BlindUserActivity extends AppCompatActivity {
         // 初始化 Firebase
         databaseReference = FirebaseDatabase.getInstance().getReference();
 
+        tts = new TextToSpeech(this, status -> {
+            if (status == TextToSpeech.SUCCESS) {
+                tts.setLanguage(Locale.US); // Set language to US English
+            }
+        });
+
         // 请求通知权限
         requestNotificationPermission();
 
         // 设置“发送帮助请求”按钮的点击事件
         Button sendRequestButton = findViewById(R.id.btn_send_request);
-        sendRequestButton.setOnClickListener(v -> sendHelpRequest());
+        sendRequestButton.setOnClickListener(v -> {
+            tts.speak("Sending help request. Please wait.", TextToSpeech.QUEUE_FLUSH, null, null);
+            sendHelpRequest();
+        });
+
+        // Set up "Volunteer Friends" button
+        Button volunteerFriendsButton = findViewById(R.id.btn_volunteer_friends);
+        volunteerFriendsButton.setOnClickListener(v -> {
+            tts.speak("Opening Volunteer Friends list.", TextToSpeech.QUEUE_FLUSH, null, null);
+            openVolunteerFriendsList();
+        });
+    }
+
+    private void openVolunteerFriendsList() {
+        Log.d("BlindUserActivity", "Opening Volunteer Friends List...");
+        Intent intent = new Intent(BlindUserActivity.this, BlindFriendsActivity.class);
+        startActivity(intent);
     }
 
     private void sendHelpRequest() {
@@ -67,10 +92,12 @@ public class BlindUserActivity extends AppCompatActivity {
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
                         Log.d("BlindUserActivity", "帮助请求成功发送");
+                        tts.speak("Help request sent successfully. Starting video call.", TextToSpeech.QUEUE_FLUSH, null, null);
                         sendNotificationToVolunteers();
                         startVideoChatActivity();
                     } else {
                         Log.e("BlindUserActivity", "帮助请求发送失败", task.getException());
+                        tts.speak("Failed to send help request. Please try again.", TextToSpeech.QUEUE_FLUSH, null, null);
                         Toast.makeText(this, "Can not send help request!", Toast.LENGTH_SHORT).show();
                     }
                 });
@@ -157,5 +184,14 @@ public class BlindUserActivity extends AppCompatActivity {
         } else {
             super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        if (tts != null) {
+            tts.stop();
+            tts.shutdown();
+        }
+        super.onDestroy();
     }
 }
