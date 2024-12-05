@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -13,9 +12,9 @@
         android:background="?attr/colorPrimary"
         android:title="Helper Page"
         android:titleTextColor="@android:color/white"
-        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent" />
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <!-- Volunteers Button -->
     <Button
@@ -23,12 +22,12 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:text="Volunteers"
-        android:textSize="18sp"
         android:textColor="@android:color/white"
-        app:layout_constraintTop_toBottomOf="@id/toolbar"
+        android:textSize="18sp"
+        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintHorizontal_bias="0.5" />
+        app:layout_constraintTop_toBottomOf="@id/toolbar" />
 
     <!-- Blind Friends Button -->
     <Button
@@ -36,12 +35,12 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:text="Blind Friends"
-        android:textSize="18sp"
         android:textColor="@android:color/white"
-        app:layout_constraintTop_toBottomOf="@id/volunteersButton"
+        android:textSize="18sp"
+        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintHorizontal_bias="0.5" />
+        app:layout_constraintTop_toBottomOf="@id/volunteersButton" />
 
     <!-- Map Button -->
     <Button
@@ -49,24 +48,21 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:text="Map"
-        android:textSize="18sp"
         android:textColor="@android:color/white"
-        app:layout_constraintTop_toBottomOf="@id/blindFriendsButton"
+        android:textSize="18sp"
+        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintHorizontal_bias="0.5" />
+        app:layout_constraintTop_toBottomOf="@id/blindFriendsButton" />
 
     <!-- Switch -->
-    <androidx.appcompat.widget.SwitchCompat
-        android:id="@+id/switchControl"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Willing to help now!"
-        android:textStyle="bold"
-        android:textSize="16sp"
-        android:textColor="@color/black"
+    <Switch
+        android:id="@+id/switch_available"
+        android:layout_width="164dp"
+        android:layout_height="78dp"
+        android:text="Ready to help!"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintHorizontal_bias="0.5" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/toolbar" />
 </androidx.constraintlayout.widget.ConstraintLayout>
