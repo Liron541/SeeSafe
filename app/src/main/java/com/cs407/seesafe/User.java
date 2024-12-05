@@ -18,6 +18,8 @@ public class User {
     @ColumnInfo(name = "friends")
     private String friends;
 
+    @ColumnInfo(name = "friend_requests")
+    private String friendRequests; // Comma-separated list of pending friend request IDs
 
     // Getters and Setters
     public int getId() {

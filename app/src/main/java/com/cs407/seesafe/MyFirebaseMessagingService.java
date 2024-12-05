@@ -60,6 +60,26 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                 this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
 
         String channelId = "help_request_channel"; // 固定通知通道 ID
+
+        //accept message & decline message
+        Intent acceptIntent = new Intent("accept_action");
+        acceptIntent.setClass(this, NotificationActionReceiver.class);
+        PendingIntent acceptPendingIntent = PendingIntent.getBroadcast(
+                this, 0, acceptIntent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+
+        // Intent for Decline action
+        Intent declineIntent = new Intent("decline_action");
+        declineIntent.setClass(this, NotificationActionReceiver.class);
+        PendingIntent declinePendingIntent = PendingIntent.getBroadcast(
+                this, 1, declineIntent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+
+        // Create notification actions
+        NotificationCompat.Action acceptAction = new NotificationCompat.Action.Builder(
+                R.drawable.ic_accept, "Accept", acceptPendingIntent).build();
+
+        NotificationCompat.Action declineAction = new NotificationCompat.Action.Builder(
+                R.drawable.ic_decline, "Decline", declinePendingIntent).build();
+
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this, channelId)
                 .setSmallIcon(R.drawable.ic_launcher_foreground) // 确保有对应的图标资源
                 .setContentTitle(title)
