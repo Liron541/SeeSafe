@@ -22,8 +22,8 @@ import io.agora.rtc2.video.VideoCanvas;
 
 public class VideoChatActivity extends AppCompatActivity {
 
-    private final String channelName = "SeeSafe123"; // 固定频道名
-    private final String token = "007eJxTYIiae+u9SLFty0E/90BRP85zOiKW7jEuTxwNpLf1PsnXb1FgSLFINk01tkw0tUhNMzGwNE8yNbe0TDUxMEhMMks1S0pZcMM/vSGQkWG2/C0WRgYIBPG5GIJTU4MT01INjYwZGABImh7y";
+    private final String channelName = "SeeSafe1"; // 固定频道名
+    private final String token = "007eJxTYFixNvaW0qO8Xwu2eTSY66+sjfnB9NBma1S1Y3vszPVGivwKDCkWyaapxpaJphapaSYGluZJpuaWlqkmBgaJSWapZkkpbzQC0xsCGRk+PuNlZWSAQBCfgyE4NTU4MS3VkIEBAO2jIOY=";
 
     private RtcEngine mRtcEngine;
 

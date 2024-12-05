@@ -31,8 +31,8 @@ import okhttp3.Response;
 
 public class BlindUserActivity extends AppCompatActivity {
 
-    private static final String FIXED_CHANNEL_NAME = "SeeSafe123"; // 固定频道名
-    private static final String FIXED_TOKEN = "007eJxTYIiae+u9SLFty0E/90BRP85zOiKW7jEuTxwNpLf1PsnXb1FgSLFINk01tkw0tUhNMzGwNE8yNbe0TDUxMEhMMks1S0pZcMM/vSGQkWG2/C0WRgYIBPG5GIJTU4MT01INjYwZGABImh7y"; // 固定 Token
+    private static final String FIXED_CHANNEL_NAME = "SeeSafe1"; // 固定频道名
+    private static final String FIXED_TOKEN = "007eJxTYFixNvaW0qO8Xwu2eTSY66+sjfnB9NBma1S1Y3vszPVGivwKDCkWyaapxpaJphapaSYGluZJpuaWlqkmBgaJSWapZkkpbzQC0xsCGRk+PuNlZWSAQBCfgyE4NTU4MS3VkIEBAO2jIOY="; // 固定 Token
     private static final int PERMISSION_REQUEST_CODE = 1;
 
     private DatabaseReference databaseReference;
