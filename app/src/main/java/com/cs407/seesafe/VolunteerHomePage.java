@@ -30,6 +30,7 @@ public class VolunteerHomePage extends AppCompatActivity {
     private Switch switchAvailable;
     private Button friendsButton;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -43,6 +44,12 @@ public class VolunteerHomePage extends AppCompatActivity {
         String username = intent.getStringExtra("username");
         if (getSupportActionBar() != null) {
             getSupportActionBar().setTitle("Welcome, " + username + "!");
+        }
+
+        if (username == null) {
+            Toast.makeText(this, "Username not found. Please log in again.", Toast.LENGTH_SHORT).show();
+            finish();
+            return;
         }
 
         // Buttons setup

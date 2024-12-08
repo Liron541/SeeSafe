@@ -1,0 +1,49 @@
+{
+  "project_info": {
+    "project_number": "71565793087",
+    "firebase_url": "https://seesafe-2a331-default-rtdb.firebaseio.com",
+    "project_id": "seesafe-2a331",
+    "storage_bucket": "seesafe-2a331.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:71565793087:android:e7f7e5cbfbfcf86c57a58a",
+        "android_client_info": {
+          "package_name": "com.cs407.example"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCdfRkj-Jz-YwoxygR2FWOhTlII3OqzSnU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:71565793087:android:019a541a71cd1bbd57a58a",
+        "android_client_info": {
+          "package_name": "com.cs407.seesafe"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCdfRkj-Jz-YwoxygR2FWOhTlII3OqzSnU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
