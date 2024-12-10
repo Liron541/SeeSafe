@@ -55,10 +55,11 @@ dependencies {
     implementation("com.google.firebase:firebase-auth-ktx")
     implementation("com.google.firebase:firebase-firestore")
     implementation("com.google.firebase:firebase-messaging-ktx")
-    implementation("com.google.firebase:firebase-database")
+    implementation("com.google.firebase:firebase-database:20.3.0")
     implementation(libs.androidx.room.common)
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.preference.ktx)
+    implementation(libs.google.services)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -68,5 +69,6 @@ dependencies {
     implementation("com.google.auth:google-auth-library-oauth2-http:1.16.0")
     implementation("org.osmdroid:osmdroid-android:6.1.10")
     annotationProcessor(libs.androidx.room.compiler)
+
 
 }

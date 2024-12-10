@@ -2,6 +2,7 @@ package com.cs407.seesafe;
 
 import android.Manifest;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -43,6 +44,21 @@ public class VolunteerHomePage extends AppCompatActivity {
         String username = intent.getStringExtra("username");
         if (getSupportActionBar() != null) {
             getSupportActionBar().setTitle("Welcome, " + username + "!");
+        }
+
+        SharedPreferences sharedPreferences = getSharedPreferences("app_prefs", MODE_PRIVATE);
+        String username1 = sharedPreferences.getString("username", null);
+        if (username1 != null) {
+            FirebaseMessaging.getInstance().subscribeToTopic("volunteer_" + username1)
+                    .addOnCompleteListener(task -> {
+                        if (task.isSuccessful()) {
+                            Log.d("VolunteerHomePage", "Subscribed to volunteer_" + username1 + " topic for friend requests");
+                        } else {
+                            Log.e("VolunteerHomePage", "Failed to subscribe to volunteer_" + username1);
+                        }
+                    });
+        } else {
+            Log.w("VolunteerHomePage", "No username found in SharedPreferences; cannot subscribe to volunteer topic.");
         }
 
         // Buttons setup

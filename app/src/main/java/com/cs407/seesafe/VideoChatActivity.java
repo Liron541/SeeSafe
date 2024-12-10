@@ -4,17 +4,22 @@ import android.Manifest;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.speech.tts.TextToSpeech;
+import android.util.Log;
 import android.view.SurfaceView;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.Toast;
+import android.content.SharedPreferences;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
+import java.io.InputStream;
+import java.util.Arrays;
 import java.util.Locale;
+import java.io.IOException;
 
 import io.agora.rtc2.ChannelMediaOptions;
 import io.agora.rtc2.Constants;
@@ -22,6 +27,20 @@ import io.agora.rtc2.IRtcEngineEventHandler;
 import io.agora.rtc2.RtcEngine;
 import io.agora.rtc2.RtcEngineConfig;
 import io.agora.rtc2.video.VideoCanvas;
+import okhttp3.MediaType;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+
+import com.google.auth.oauth2.GoogleCredentials;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.OnFailureListener;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 public class VideoChatActivity extends AppCompatActivity {
 
@@ -56,6 +75,22 @@ public class VideoChatActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_video_chat);
+        String blindUserId = "blindUser123";
+
+        SharedPreferences sharedPreferences = getSharedPreferences("app_prefs", MODE_PRIVATE);
+        String volunteerUsername = sharedPreferences.getString("username", null);
+        Log.d("VideoChatActivity", "Retrieved volunteerUsername from SharedPreferences: " + volunteerUsername);
+
+        Button addFriendButton = findViewById(R.id.btn_add_friend);
+        addFriendButton.setOnClickListener(v -> {
+            if (volunteerUsername == null || volunteerUsername.isEmpty()) {
+                Toast.makeText(VideoChatActivity.this, "Cannot send friend request because the username is unknown.", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            // Use the correct username when sending the friend request
+            sendFriendRequest("blindUser123", volunteerUsername);
+        });
 
         tts = new TextToSpeech(this, status -> {
             if (status == TextToSpeech.SUCCESS) {
@@ -189,5 +224,74 @@ public class VideoChatActivity extends AppCompatActivity {
             tts.stop();
             tts.shutdown();
         }
+    }
+
+    private void sendFriendRequest(String blindUserId, String volunteerId) {
+        DatabaseReference database = FirebaseDatabase.getInstance().getReference();
+        String requestKey = database.child("friend_requests").push().getKey();
+        if (requestKey == null) return;
+
+        FriendRequest friendRequest = new FriendRequest(blindUserId, volunteerId, System.currentTimeMillis());
+        database.child("friend_requests").child(requestKey).setValue(friendRequest)
+                .addOnSuccessListener(aVoid -> {
+                    Log.d("VideoChatActivity", "Friend request stored, sending notification...");
+                    sendFriendRequestNotificationToVolunteer(volunteerId, blindUserId, requestKey);
+                    Toast.makeText(VideoChatActivity.this, "Friend request sent!", Toast.LENGTH_SHORT).show();
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(VideoChatActivity.this, "Failed to send friend request", Toast.LENGTH_SHORT).show();
+                });
+    }
+
+    private void sendFriendRequestNotificationToVolunteer(String volunteerId, String blindUserId, String requestKey) {
+        try {
+            JSONObject message = new JSONObject();
+            JSONObject data = new JSONObject();
+
+            data.put("request_type", "friend_request");
+            data.put("blindUserId", blindUserId);
+            data.put("requestKey", requestKey);
+
+            // Volunteers should subscribe to topic "volunteer_<volunteerId>"
+            message.put("data", data);
+            message.put("topic", "volunteer_" + volunteerId);
+
+            sendNotification(message);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void sendNotification(JSONObject message) {
+        new Thread(() -> {
+            try {
+                String accessToken = getAccessToken();
+                OkHttpClient client = new OkHttpClient();
+
+                RequestBody body = RequestBody.create(message.toString(), MediaType.get("application/json; charset=utf-8"));
+                Request request = new Request.Builder()
+                        .url("https://fcm.googleapis.com/v1/projects/seesafe-2a331/messages:send")
+                        .addHeader("Authorization", "Bearer " + accessToken)
+                        .addHeader("Content-Type", "application/json; UTF-8")
+                        .post(body)
+                        .build();
+
+                okhttp3.Response response = client.newCall(request).execute();
+                if (!response.isSuccessful()) {
+                    System.err.println("Notification sending failed: " + response.code() + " - " + response.message());
+                }
+                response.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }).start();
+    }
+
+    private String getAccessToken() throws IOException {
+        InputStream serviceAccountStream = getResources().openRawResource(R.raw.service_account_key);
+        GoogleCredentials googleCredentials = GoogleCredentials.fromStream(serviceAccountStream)
+                .createScoped(Arrays.asList("https://www.googleapis.com/auth/firebase.messaging"));
+        googleCredentials.refresh();
+        return googleCredentials.getAccessToken().getTokenValue();
     }
 }

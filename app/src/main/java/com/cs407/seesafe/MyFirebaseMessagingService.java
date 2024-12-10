@@ -7,8 +7,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.util.Log;
+import android.Manifest;
+import android.content.pm.PackageManager;
 
 import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
 
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
@@ -31,29 +34,96 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
             return;
         }
 
-        // 设置默认通知内容
-        String title = "Help!";
-        String messageBody = "Blind users need help";
+        // 从数据中检查请求类型
+        String requestType = remoteMessage.getData().get("request_type");
 
-        // 如果消息包含通知字段，覆盖默认内容
-        if (remoteMessage.getNotification() != null) {
-            title = remoteMessage.getNotification().getTitle() != null
-                    ? remoteMessage.getNotification().getTitle()
-                    : title;
-            messageBody = remoteMessage.getNotification().getBody() != null
-                    ? remoteMessage.getNotification().getBody()
-                    : messageBody;
+        if ("friend_request".equals(requestType)) {
+            // 如果是好友请求
+            String blindUserId = remoteMessage.getData().get("blindUserId");
+            String requestKey = remoteMessage.getData().get("requestKey");
+            if (blindUserId != null && requestKey != null) {
+                showFriendRequestNotification(blindUserId, requestKey);
+            } else {
+                Log.w("MyFirebaseMessagingService", "Friend request missing blindUserId or requestKey");
+            }
+        } else {
+            // 处理帮助请求或默认消息
+            // 设置默认通知内容
+            String title = "Help!";
+            String messageBody = "Blind users need help";
+
+            // 如果消息包含通知字段，覆盖默认内容
+            if (remoteMessage.getNotification() != null) {
+                title = remoteMessage.getNotification().getTitle() != null
+                        ? remoteMessage.getNotification().getTitle()
+                        : title;
+                messageBody = remoteMessage.getNotification().getBody() != null
+                        ? remoteMessage.getNotification().getBody()
+                        : messageBody;
+            }
+
+            // 创建点击通知时启动的 Intent
+            Intent intent = new Intent(this, VolunteerActivity.class);
+            intent.putExtra("CHANNEL_NAME", fixedChannelName);
+            intent.putExtra("TOKEN", fixedToken);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+
+            // 调用发送通知方法
+            sendNotification(title, messageBody, intent);
+
+        }
+        Log.d("MyFirebaseMessagingService", "Message data: " + remoteMessage.getData());
+    }
+
+    private void showFriendRequestNotification(String blindUserId, String requestKey) {
+        Intent acceptIntent = new Intent(this, NotificationActionReceiver.class);
+        acceptIntent.setAction("ACCEPT_FRIEND_REQUEST");
+        acceptIntent.putExtra("requestKey", requestKey);
+        acceptIntent.putExtra("blindUserId", blindUserId);
+        PendingIntent acceptPendingIntent = PendingIntent.getBroadcast(
+                this, 0, acceptIntent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+
+        Intent declineIntent = new Intent(this, NotificationActionReceiver.class);
+        declineIntent.setAction("DECLINE_FRIEND_REQUEST");
+        declineIntent.putExtra("requestKey", requestKey);
+        declineIntent.putExtra("blindUserId", blindUserId);
+        PendingIntent declinePendingIntent = PendingIntent.getBroadcast(
+                this, 1, declineIntent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+
+        String channelId = "friend_request_channel";
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, channelId)
+                .setSmallIcon(R.drawable.ic_launcher_foreground)
+                .setContentTitle("Friend Request")
+                .setContentText("blind user wants to add you as a friend.")
+                .addAction(new NotificationCompat.Action(R.drawable.ic_accept, "Accept", acceptPendingIntent))
+                .addAction(new NotificationCompat.Action(R.drawable.ic_decline, "Decline", declinePendingIntent))
+                .setAutoCancel(true)
+                .setPriority(NotificationCompat.PRIORITY_HIGH);
+
+        NotificationManager notificationManager =
+                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationChannel channel = new NotificationChannel(
+                    channelId,
+                    "Friend Request Notifications",
+                    NotificationManager.IMPORTANCE_HIGH);
+            notificationManager.createNotificationChannel(channel);
         }
 
-        // 创建点击通知时启动的 Intent
-        Intent intent = new Intent(this, VolunteerActivity.class);
-        intent.putExtra("CHANNEL_NAME", fixedChannelName);
-        intent.putExtra("TOKEN", fixedToken);
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-
-        // 调用发送通知方法
-        sendNotification(title, messageBody, intent);
+// Check notification permission here just like in sendNotification()
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU ||
+                checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED) {
+            try {
+                notificationManager.notify((int) System.currentTimeMillis(), builder.build());
+            } catch (SecurityException e) {
+                Log.w("MyFirebaseMessagingService", "SecurityException: Notification permission not granted");
+            }
+        } else {
+            Log.w("MyFirebaseMessagingService", "Notification permission not granted, cannot show notification.");
+        }
     }
+
 
     private void sendNotification(String title, String messageBody, Intent intent) {
         PendingIntent pendingIntent = PendingIntent.getActivity(
@@ -91,6 +161,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         NotificationManager notificationManager =
                 (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationChannel channel = new NotificationChannel(
                     channelId,
@@ -99,6 +170,13 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
             notificationManager.createNotificationChannel(channel);
         }
 
-        notificationManager.notify(0, notificationBuilder.build());
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU ||
+                checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED) {
+            notificationManager.notify(0, notificationBuilder.build());
+        } else {
+            Log.w("MyFirebaseMessagingService", "Notification permission not granted, cannot show notification.");
+        }
+
+
     }
 }

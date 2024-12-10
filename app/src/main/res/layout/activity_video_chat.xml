@@ -5,7 +5,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <!-- Add Friend Button -->
     <Button
         android:id="@+id/btn_add_friend"
         android:layout_width="0dp"
@@ -16,14 +15,12 @@
         android:textSize="20sp"
         android:textStyle="bold"
         android:gravity="center"
-        android:contentDescription="Button to add a friend to your contact list, you can limited 4 friend spot total"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toStartOf="@id/btn_send_location"
         app:layout_constraintHeight_percent="0.15"
-        app:cornerRadius="0dp" />
+        app:layout_constraintWidth_percent="0.5" />
 
-    <!-- Send Location Button -->
     <Button
         android:id="@+id/btn_send_location"
         android:layout_width="0dp"
@@ -33,13 +30,11 @@
         android:textSize="20sp"
         android:textStyle="bold"
         android:gravity="center"
-        android:contentDescription="Button to share your current location with volunteer"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toEndOf="@id/btn_add_friend"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHeight_percent="0.15"
-        app:cornerRadius="0dp" />
-
+        app:layout_constraintWidth_percent="0.5"/>
     <!-- Middle Section: Remote and Local Video Views Side by Side -->
     <FrameLayout
         android:id="@+id/remote_video_view_container"

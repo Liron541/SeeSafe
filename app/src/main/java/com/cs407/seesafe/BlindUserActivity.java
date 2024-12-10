@@ -2,6 +2,7 @@ package com.cs407.seesafe;
 
 import android.Manifest;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.speech.tts.TextToSpeech;
@@ -42,6 +43,7 @@ public class BlindUserActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_blind);
 
@@ -79,8 +81,14 @@ public class BlindUserActivity extends AppCompatActivity {
     }
 
     private void sendHelpRequest() {
+        SharedPreferences sharedPreferences = getSharedPreferences("app_prefs", MODE_PRIVATE);
         Log.d("BlindUserActivity", "发送帮助请求...");
+        String volunteerUsername = sharedPreferences.getString("username", "");
 
+        if (volunteerUsername == null) {
+            Toast.makeText(this, "No volunteer username found. Please log in first.", Toast.LENGTH_SHORT).show();
+            return;
+        }
         // 创建帮助请求对象
         HelpRequest helpRequest = new HelpRequest();
         helpRequest.setUserId("blindUserId");
@@ -91,23 +99,25 @@ public class BlindUserActivity extends AppCompatActivity {
         databaseReference.child("help_requests").setValue(helpRequest)
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
-                        Log.d("BlindUserActivity", "帮助请求成功发送");
+                        Log.d("BlindUserActivity", "Help request sent successfully");
                         tts.speak("Help request sent successfully. Starting video call.", TextToSpeech.QUEUE_FLUSH, null, null);
                         sendNotificationToVolunteers();
-                        startVideoChatActivity();
+                        startVideoChatActivity(volunteerUsername);
                     } else {
-                        Log.e("BlindUserActivity", "帮助请求发送失败", task.getException());
+                        Log.e("BlindUserActivity", "Failed to send help request", task.getException());
                         tts.speak("Failed to send help request. Please try again.", TextToSpeech.QUEUE_FLUSH, null, null);
                         Toast.makeText(this, "Can not send help request!", Toast.LENGTH_SHORT).show();
                     }
                 });
     }
 
-    private void startVideoChatActivity() {
-        Intent intent = new Intent(this, VideoChatActivity.class);
-        intent.putExtra("CHANNEL_NAME", FIXED_CHANNEL_NAME);
-        intent.putExtra("TOKEN", FIXED_TOKEN);
-        startActivity(intent);
+    private void startVideoChatActivity(String volunteerUsername) {
+        // Start the video chat activity with correct intent
+        Intent videoChatIntent = new Intent(this, VideoChatActivity.class);
+        videoChatIntent.putExtra("CHANNEL_NAME", FIXED_CHANNEL_NAME);
+        videoChatIntent.putExtra("TOKEN", FIXED_TOKEN);
+        videoChatIntent.putExtra("VOLUNTEER_USERNAME", volunteerUsername); // Pass volunteer username
+        startActivity(videoChatIntent);
     }
 
     private String getAccessToken() throws IOException {
@@ -160,6 +170,8 @@ public class BlindUserActivity extends AppCompatActivity {
             Log.e("BlindUserActivity", "构造通知消息失败", e);
         }
     }
+
+
 
     private void requestNotificationPermission() {
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
