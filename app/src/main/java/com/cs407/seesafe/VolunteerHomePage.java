@@ -11,6 +11,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.Switch;
 import android.widget.Toast;
 
@@ -62,21 +63,7 @@ public class VolunteerHomePage extends AppCompatActivity {
         }
 
         // Buttons setup
-        Button volunteersButton = findViewById(R.id.volunteersButton);
-        Button blindFriendsButton = findViewById(R.id.blindFriendsButton);
-        Button mapButton = findViewById(R.id.mapButton);
-
-        volunteersButton.setOnClickListener(v -> {
-            Intent volunteerIntent = new Intent(VolunteerHomePage.this, FriendListActivity.class);
-            volunteerIntent.putExtra("group", "Volunteers");
-            startActivity(volunteerIntent);
-        });
-
-        blindFriendsButton.setOnClickListener(v -> {
-            Intent blindFriendsIntent = new Intent(VolunteerHomePage.this, FriendListActivity.class);
-            blindFriendsIntent.putExtra("group", "Blind Friends");
-            startActivity(blindFriendsIntent);
-        });
+        ImageButton mapButton = findViewById(R.id.mapButton);
 
         mapButton.setOnClickListener(v -> {
             Intent mapIntent = new Intent(VolunteerHomePage.this, MapActivity.class);
