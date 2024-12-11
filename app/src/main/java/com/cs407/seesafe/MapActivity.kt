@@ -1,12 +1,14 @@
 package com.cs407.seesafe
 
 import android.Manifest
+import android.content.ContentValues.TAG
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings
+import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -20,14 +22,24 @@ import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay
 import java.util.*
 import kotlin.math.*
+import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.*
 
 class MapActivity : AppCompatActivity() {
+
+    companion object {
+        private const val TAG = "MapActivity" // Define TAG as a simple string
+    }
 
     private val REQUEST_PERMISSIONS_REQUEST_CODE = 1
     private lateinit var mapView: MapView
     private lateinit var locationOverlay: MyLocationNewOverlay
     private var pointsAdded = false
     private var username: String? = null
+
+    private lateinit var databaseReference: DatabaseReference
+    private val blindUserMarkers = HashMap<String, Marker>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -44,6 +56,8 @@ class MapActivity : AppCompatActivity() {
         mapView = findViewById(R.id.map)
         mapView.setMultiTouchControls(true)
         mapView.controller.setZoom(15.0)
+
+        databaseReference = FirebaseDatabase.getInstance().getReference("blind_users_locations")
 
         // Request necessary permissions
         requestPermissionsIfNecessary(arrayOf(
@@ -75,62 +89,43 @@ class MapActivity : AppCompatActivity() {
         // Set a listener for location changes
         locationOverlay.runOnFirstFix {
             runOnUiThread {
-                if (!pointsAdded) {
-                    addRandomMarkers(locationOverlay.myLocation)
-                    pointsAdded = true
-                }
+                listenToBlindUsersLocations()
             }
         }
     }
 
-    private fun addRandomMarkers(center: GeoPoint?) {
-        if (center == null) {
-            Toast.makeText(this, "Unable to determine current location.", Toast.LENGTH_SHORT).show()
-            return
-        }
+    private fun listenToBlindUsersLocations() {
+        databaseReference.addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                // Clear existing blind user markers
+                for (marker in blindUserMarkers.values) {
+                    mapView.overlays.remove(marker)
+                }
+                blindUserMarkers.clear()
 
-        val random = Random()
-        val radiusMiles = 0.5
+                for (child in snapshot.children) {
+                    val blindUserLocation = child.getValue(BlindUserLocation::class.java)
+                    if (blindUserLocation != null) {
+                        val geoPoint = GeoPoint(blindUserLocation.latitude ?: 0.0, blindUserLocation.longitude ?: 0.0)
+                        val marker = Marker(mapView)
+                        marker.position = geoPoint
+                        marker.icon = ContextCompat.getDrawable(this@MapActivity, R.drawable.ic_menu_mapmode) // Use a distinct icon
+                        marker.title = "Blind User"
+                        marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
+                        mapView.overlays.add(marker)
 
-        for (i in 1..10) {
-            val randomPoint = getRandomGeoPoint(center, radiusMiles)
-            val marker = Marker(mapView)
-            marker.position = randomPoint
-            marker.icon = ContextCompat.getDrawable(this, R.drawable.ic_menu_mapmode)
-            marker.title = "User $i"
-            marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
-            mapView.overlays.add(marker)
-        }
+                        // Optionally, store markers by ID for future reference
+                        blindUserMarkers[blindUserLocation.id ?: ""] = marker
+                    }
+                }
+                mapView.invalidate()
+            }
 
-        mapView.invalidate()
-    }
-
-    /**
-     * Generates a random GeoPoint within the specified radius (in miles) from the center point.
-     */
-    private fun getRandomGeoPoint(center: GeoPoint, radiusInMiles: Double): GeoPoint {
-        val radiusInMeters = radiusInMiles * 1609.34 // Convert miles to meters
-        val random = Random()
-        val distance = random.nextDouble() * radiusInMeters
-        val bearing = random.nextDouble() * 360
-
-        val R = 6371000.0 // Earth radius in meters
-        val radDist = distance / R
-        val radBearing = Math.toRadians(bearing)
-
-        val lat1 = Math.toRadians(center.latitude)
-        val lon1 = Math.toRadians(center.longitude)
-
-        val lat2 = asin(sin(lat1) * cos(radDist) + cos(lat1) * sin(radDist) * cos(radBearing))
-        val lon2 = lon1 + atan2(
-            sin(radBearing) * sin(radDist) * cos(lat1),
-            cos(radDist) - sin(lat1) * sin(lat2)
-        )
-
-        val newLat = Math.toDegrees(lat2)
-        val newLon = Math.toDegrees(lon2)
-
-        return GeoPoint(newLat, newLon)
+            override fun onCancelled(error: DatabaseError) {
+                Toast.makeText(this@MapActivity, "Failed to load blind users' locations.", Toast.LENGTH_SHORT).show()
+                Log.e(TAG, "Database error: ${error.message}")
+            }
+        })
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
