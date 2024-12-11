@@ -39,6 +39,7 @@ import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
+import okhttp3.Response;
 
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.firebase.database.DatabaseReference;
@@ -391,49 +392,69 @@ public class VideoChatActivity extends AppCompatActivity {
         }
     }
 
-    private void sendFriendRequest(String blindUserId, String volunteerId) {
-        DatabaseReference database = FirebaseDatabase.getInstance().getReference();
-        String requestKey = database.child("friend_requests").push().getKey();
-        if (requestKey == null) return;
+    private void sendFriendRequest(String blindUserId, String volunteerUsername) {
+        Log.d("VideoChatActivity", "Sending friend request...");
 
-        FriendRequest friendRequest = new FriendRequest(blindUserId, volunteerId, System.currentTimeMillis());
-        database.child("friend_requests").child(requestKey).setValue(friendRequest)
-                .addOnSuccessListener(aVoid -> {
-                    Log.d("VideoChatActivity", "Friend request stored, sending notification...");
-                    sendFriendRequestNotificationToVolunteer(volunteerId, blindUserId, requestKey);
-                    Toast.makeText(VideoChatActivity.this, "Friend request sent!", Toast.LENGTH_SHORT).show();
-                })
-                .addOnFailureListener(e -> {
-                    Toast.makeText(VideoChatActivity.this, "Failed to send friend request", Toast.LENGTH_SHORT).show();
+        // Create FriendRequest object
+        FriendRequest friendRequest = new FriendRequest();
+        friendRequest.setVolunteerId(volunteerUsername);
+        friendRequest.setTimestamp(System.currentTimeMillis());
+
+        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference();
+        String requestKey = databaseReference.child("friend_requests").push().getKey();
+        if (requestKey == null) {
+            Toast.makeText(this, "Unable to create friend request.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Store the friend request in Firebase
+        databaseReference.child("friend_requests").child(requestKey).setValue(friendRequest)
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        Log.d("VideoChatActivity", "Friend request stored successfully");
+                        Toast.makeText(this, "Friend request sent!", Toast.LENGTH_SHORT).show();
+
+                        // Send notification to the volunteer device
+                        sendFriendRequestNotificationToVolunteer(volunteerUsername, blindUserId, requestKey);
+
+                        // If you want to start a video call like in help request scenario, do so:
+                        // startVideoChatActivity(volunteerUsername);
+
+                    } else {
+                        Log.e("VideoChatActivity", "Failed to send friend request", task.getException());
+                        Toast.makeText(this, "Failed to send friend request.", Toast.LENGTH_SHORT).show();
+                    }
                 });
     }
 
-    private void sendFriendRequestNotificationToVolunteer(String volunteerId, String blindUserId, String requestKey) {
+    private void sendFriendRequestNotificationToVolunteer(String volunteerUsername, String blindUserId, String requestKey) {
         try {
             JSONObject message = new JSONObject();
             JSONObject data = new JSONObject();
 
+            // Set friend request specific data fields
             data.put("request_type", "friend_request");
             data.put("blindUserId", blindUserId);
             data.put("requestKey", requestKey);
 
-            // Volunteers should subscribe to topic "volunteer_<volunteerId>"
+            // Set the topic to "volunteer_<volunteerUsername>"
             message.put("data", data);
-            message.put("topic", "volunteer_" + volunteerId);
+            message.put("topic", "volunteer_" + volunteerUsername);
 
-            sendNotification(message);
+            sendNotification(new JSONObject().put("message", message));
         } catch (JSONException e) {
-            e.printStackTrace();
+            Log.e("VideoChatActivity", "Failed to construct friend request notification JSON", e);
         }
     }
 
-    private void sendNotification(JSONObject message) {
+
+    private void sendNotification(JSONObject notification) {
         new Thread(() -> {
             try {
                 String accessToken = getAccessToken();
                 OkHttpClient client = new OkHttpClient();
 
-                RequestBody body = RequestBody.create(message.toString(), MediaType.get("application/json; charset=utf-8"));
+                RequestBody body = RequestBody.create(notification.toString(), MediaType.get("application/json; charset=utf-8"));
                 Request request = new Request.Builder()
                         .url("https://fcm.googleapis.com/v1/projects/seesafe-2a331/messages:send")
                         .addHeader("Authorization", "Bearer " + accessToken)
@@ -441,13 +462,16 @@ public class VideoChatActivity extends AppCompatActivity {
                         .post(body)
                         .build();
 
-                okhttp3.Response response = client.newCall(request).execute();
-                if (!response.isSuccessful()) {
-                    System.err.println("Notification sending failed: " + response.code() + " - " + response.message());
+                Response response = client.newCall(request).execute();
+                if (response.isSuccessful()) {
+                    Log.i("VideoChatActivity", "Friend request notification sent successfully");
+                } else {
+                    Log.e("VideoChatActivity", "Friend request notification failed, code: " + response.code()
+                            + " response: " + response.body().string());
                 }
                 response.close();
             } catch (Exception e) {
-                e.printStackTrace();
+                Log.e("VideoChatActivity", "Failed to send friend request notification", e);
             }
         }).start();
     }

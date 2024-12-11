@@ -49,9 +49,8 @@ public class LoginActivity extends AppCompatActivity {
                         SharedPreferences.Editor editor = sharedPreferences.edit();
                         editor.putString("username", user.getUsername());
                         editor.putInt("userId", user.getId());
-                        editor.apply();// Save username
-
                         editor.putBoolean("IS_VOLUNTEER", true);
+                        editor.apply();// Save username
 
                         boolean isSaved = editor.commit();
 
