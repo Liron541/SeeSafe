@@ -26,7 +26,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
         // 检查设备角色
         boolean isVolunteerDevice = getSharedPreferences("app_prefs", MODE_PRIVATE)
-                .getBoolean("IS_VOLUNTEER", false);
+                .getBoolean("IS_VOLUNTEER", true);
 
         if (!isVolunteerDevice) {
             // 如果设备是盲人端，忽略消息
@@ -76,6 +76,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
     }
 
     private void showFriendRequestNotification(String blindUserId, String requestKey) {
+        // Create intents for accept and decline actions
         Intent acceptIntent = new Intent(this, NotificationActionReceiver.class);
         acceptIntent.setAction("ACCEPT_FRIEND_REQUEST");
         acceptIntent.putExtra("requestKey", requestKey);
@@ -90,19 +91,21 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         PendingIntent declinePendingIntent = PendingIntent.getBroadcast(
                 this, 1, declineIntent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
 
+        // Set up channel for friend request notifications
         String channelId = "friend_request_channel";
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this, channelId)
-                .setSmallIcon(R.drawable.ic_launcher_foreground)
+                .setSmallIcon(R.drawable.ic_launcher_foreground) // Ensure this icon exists
                 .setContentTitle("Friend Request")
-                .setContentText("blind user wants to add you as a friend.")
-                .addAction(new NotificationCompat.Action(R.drawable.ic_accept, "Accept", acceptPendingIntent))
-                .addAction(new NotificationCompat.Action(R.drawable.ic_decline, "Decline", declinePendingIntent))
+                .setContentText("A blind user wants to add you as a friend.")
                 .setAutoCancel(true)
-                .setPriority(NotificationCompat.PRIORITY_HIGH);
+                .setPriority(NotificationCompat.PRIORITY_HIGH)
+                .addAction(R.drawable.ic_accept, "Accept", acceptPendingIntent)
+                .addAction(R.drawable.ic_decline, "Decline", declinePendingIntent);
 
         NotificationManager notificationManager =
                 (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
+        // Create notification channel if on Oreo or above
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationChannel channel = new NotificationChannel(
                     channelId,
@@ -111,11 +114,13 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
             notificationManager.createNotificationChannel(channel);
         }
 
-// Check notification permission here just like in sendNotification()
+        // Check notification permission if on Android 13+
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU ||
                 checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED) {
             try {
+                // Use a unique notification ID (System.currentTimeMillis())
                 notificationManager.notify((int) System.currentTimeMillis(), builder.build());
+                Log.d("MyFirebaseMessagingService", "Friend request notification displayed.");
             } catch (SecurityException e) {
                 Log.w("MyFirebaseMessagingService", "SecurityException: Notification permission not granted");
             }
@@ -123,7 +128,6 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
             Log.w("MyFirebaseMessagingService", "Notification permission not granted, cannot show notification.");
         }
     }
-
 
     private void sendNotification(String title, String messageBody, Intent intent) {
         PendingIntent pendingIntent = PendingIntent.getActivity(
@@ -143,12 +147,6 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         PendingIntent declinePendingIntent = PendingIntent.getBroadcast(
                 this, 1, declineIntent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
 
-        // Create notification actions
-        NotificationCompat.Action acceptAction = new NotificationCompat.Action.Builder(
-                R.drawable.ic_accept, "Accept", acceptPendingIntent).build();
-
-        NotificationCompat.Action declineAction = new NotificationCompat.Action.Builder(
-                R.drawable.ic_decline, "Decline", declinePendingIntent).build();
 
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this, channelId)
                 .setSmallIcon(R.drawable.ic_launcher_foreground) // 确保有对应的图标资源
