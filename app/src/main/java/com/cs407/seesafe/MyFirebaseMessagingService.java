@@ -18,7 +18,7 @@ import com.google.firebase.messaging.RemoteMessage;
 
 public class MyFirebaseMessagingService extends FirebaseMessagingService {
     private final String fixedChannelName = "SeeSafe1"; // 固定频道名
-    private final String fixedToken = "007eJxTYFixNvaW0qO8Xwu2eTSY66+sjfnB9NBma1S1Y3vszPVGivwKDCkWyaapxpaJphapaSYGluZJpuaWlqkmBgaJSWapZkkpbzQC0xsCGRk+PuNlZWSAQBCfgyE4NTU4MS3VkIEBAO2jIOY=";
+    private final String fixedToken = "007eJxTYPgg+rt7cpmX0A6+S7s/RNr5Rx79m3sn67Huo35t+T07X+YqMKRYJJumGlsmmlqkppkYWJonmZpbWqaaGBgkJpmlmiWleM6LTG8IZGQ4vE+OmZEBAkF8Dobg1NTgxLRUQwYGAHL5Iok=";
 
     @Override
     public void onMessageReceived(RemoteMessage remoteMessage) {
